@@ -197,7 +197,10 @@ class Pi05Adapter:
         with self.autocast():
             return self.memory.train_sequence(
                 lambda t: self.loss_prepared(batches[t]),
-                lambda t: self._clean_pass(batches[t]), num_chunks=len(batches),
+                lambda t: self._clean_pass({
+                    **batches[t],
+                    "action": batches[t]["action"][:, :self.policy.config.n_action_steps],
+                }), num_chunks=len(batches),
                 batch=batches[0]["action"].shape[0], segment_len=segment_len,
                 backward=backward)
 
